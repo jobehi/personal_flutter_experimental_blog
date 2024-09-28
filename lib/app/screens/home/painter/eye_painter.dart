@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class EyePainter extends CustomPainter {
+  static const strokeScalingFactor = 70;
+
   final Offset mousePositionPercentage;
 
   EyePainter({required this.mousePositionPercentage});
@@ -17,7 +19,7 @@ class EyePainter extends CustomPainter {
 
       return Paint()
         ..color = Colors.white
-        ..strokeWidth = size.width / 70
+        ..strokeWidth = size.width / strokeScalingFactor
         ..style = PaintingStyle.stroke
         ..shader = withGradient ? gradientShader : null;
     }
@@ -74,6 +76,9 @@ class EyePainter extends CustomPainter {
 
     // Define the paint for the Iris
     var irisPaint = getPaint(withGradient: false);
+
+    irisPaint.strokeWidth = size.width / (strokeScalingFactor * 0.75);
+
     canvas.drawCircle(
         Offset(irisCenter.dx, irisCenter.dy), eyeballRadius, irisPaint);
 

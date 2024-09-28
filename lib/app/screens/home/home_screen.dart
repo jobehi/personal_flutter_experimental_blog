@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:youssef_el_behi/app/screens/home/eye_painter.dart';
+import 'package:youssef_el_behi/app/screens/home/painter/eye_painter.dart';
 
 import 'widgets/leaving_text.dart';
 
@@ -22,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   // Smoothing factor for movement interpolation
   final _smoothingFactor = 0.05;
-  final eyeSize = 300.0;
+  final eyeSize = 200.0;
 
   @override
   void initState() {
