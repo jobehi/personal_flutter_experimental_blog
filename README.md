@@ -1,3 +1,4 @@
-# youssef_el_behi
+# An Experimental Flutter web app made with CustomPainters
 
-A new Flutter project.
+This is an experimental Flutter web app made with CustomPainters. 
+It will possibly serve as a base for a personal blog.
