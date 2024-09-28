@@ -34,7 +34,11 @@ class LeavingTextState extends State<LeavingText> {
             },
           ),
           const SizedBox(height: 20),
-          if (displayAnswers) _buildAnswerButtons(),
+          AnimatedOpacity(
+              curve: Curves.easeInOut,
+              duration: const Duration(seconds: 1),
+              opacity: displayAnswers ? 1 : 0,
+              child: _buildAnswerButtons()),
         ],
       ),
     );
