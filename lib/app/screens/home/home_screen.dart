@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:youssef_el_behi/app/screens/home/eye_painter.dart';
 
+import 'widgets/leaving_text.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -12,13 +14,15 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   late final Ticker _ticker;
+  bool isInDangerZone = false;
 
   // Current and target eye positions, normalized between 0 and 1
   Offset _currentEyePosition = const Offset(0.5, 0.5);
   Offset _targetEyePosition = const Offset(0.5, 0.5);
 
   // Smoothing factor for movement interpolation
-  static const double _smoothingFactor = 0.05;
+  final _smoothingFactor = 0.05;
+  final eyeSize = 300.0;
 
   @override
   void initState() {
@@ -49,6 +53,10 @@ class _HomeScreenState extends State<HomeScreen>
 
   /// Updates the target eye position with clamped values
   void _updateTargetPosition(Offset normalizedPosition) {
+    if (!isInDangerZone) {
+      _detectsMouseLeaving(normalizedPosition);
+    }
+
     final clampedPosition = Offset(
       normalizedPosition.dx.clamp(0.0, 1.0),
       normalizedPosition.dy.clamp(0.0, 1.0),
@@ -65,6 +73,25 @@ class _HomeScreenState extends State<HomeScreen>
       position.dx / size.width,
       position.dy / size.height,
     );
+  }
+
+  void _detectsMouseLeaving(Offset position) {
+    /// checks for 5 seconds if the mouse is in the danger zone
+    final dangerZoneRect = Rect.fromCircle(
+      center: position,
+      radius: 0.2,
+    );
+
+    /// exist zone
+    const topLeftCorner = Offset(0, 0);
+
+    final isLeaving = dangerZoneRect.contains(topLeftCorner);
+
+    if (isLeaving) {
+      setState(() {
+        isInDangerZone = true;
+      });
+    }
   }
 
   @override
@@ -85,15 +112,22 @@ class _HomeScreenState extends State<HomeScreen>
             },
             child: Scaffold(
               body: Center(
-                child: SizedBox(
-                  width: 200,
-                  child: AspectRatio(
-                    aspectRatio: 1,
-                    child: CustomPaint(
-                      painter: EyePainter(
-                          mousePositionPercentage: _currentEyePosition),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: eyeSize,
+                      child: AspectRatio(
+                        aspectRatio: 1,
+                        child: CustomPaint(
+                          painter: EyePainter(
+                              mousePositionPercentage: _currentEyePosition),
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 20),
+                    if (isInDangerZone) const LeavingText(),
+                  ],
                 ),
               ),
             ),
