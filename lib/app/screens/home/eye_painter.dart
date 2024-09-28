@@ -17,7 +17,7 @@ class EyePainter extends CustomPainter {
 
       return Paint()
         ..color = Colors.white
-        ..strokeWidth = 4.0
+        ..strokeWidth = size.width / 70
         ..style = PaintingStyle.stroke
         ..shader = withGradient ? gradientShader : null;
     }
