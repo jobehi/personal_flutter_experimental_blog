@@ -3,7 +3,6 @@ name: Build and Deploy Flutter Web to GitHub Pages
 # Define permissions
 permissions:
     contents: write   # Grants write access to the contents (required for pushing)
-  
 
 # Trigger the workflow on push to the release/web branch
 on:
@@ -32,14 +31,9 @@ jobs:
 
       # Step 4: Build the Flutter web app
       - name: Build Flutter Web
-        run: flutter build web
+        run: flutter build web --release --base-href /repo/
 
-      # Step 5: Modify index.html to remove <base href="/">
-      - name: Remove <base href="/"> from index.html
-        run: |
-         grep -v '<base href="/">' build/web/index.html > build/web/index_temp.html mv build/web/index_temp.html build/web/index.html
-
-      # Step 6: Deploy to GitHub Pages
+      # Step 5: Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
