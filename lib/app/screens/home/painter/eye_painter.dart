@@ -24,6 +24,23 @@ class EyePainter extends CustomPainter {
         ..shader = withGradient ? gradientShader : null;
     }
 
+    // draw eyebrow
+    final eyebrowPaint = getPaint(withGradient: false);
+    eyebrowPaint.strokeWidth = size.width / (strokeScalingFactor * 0.7);
+    final eyebrowPath = Path();
+
+    final eyeBrowCurveMouse = mousePositionPercentage.dy * size.height / 4;
+
+    eyebrowPath.moveTo(0, size.height / 4);
+    eyebrowPath.quadraticBezierTo(
+      size.width / 2,
+      eyeBrowCurveMouse,
+      size.width,
+      size.height / 4,
+    );
+
+    canvas.drawPath(eyebrowPath, eyebrowPaint);
+
     // Define the paint
     var eyelidpaint = getPaint(withGradient: true);
 

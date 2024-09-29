@@ -25,7 +25,6 @@ class LeavingTextState extends State<LeavingText> {
             text: leavingText,
             textStyle: const TextStyle(
               fontSize: 20,
-              fontWeight: FontWeight.bold,
             ),
             onCompleted: () {
               setState(() {
