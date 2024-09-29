@@ -5,7 +5,12 @@ class EyePainter extends CustomPainter {
 
   final Offset mousePositionPercentage;
 
-  EyePainter({required this.mousePositionPercentage});
+  /// the eyelid position is a value between 0 and 1
+  /// - 0 means the eye is fully open
+  /// - 1 means the eye is fully closed
+  final double eyelidPosition;
+  EyePainter(
+      {required this.mousePositionPercentage, this.eyelidPosition = 0.0});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -24,7 +29,7 @@ class EyePainter extends CustomPainter {
         ..shader = withGradient ? gradientShader : null;
     }
 
-    // draw eyebrow
+    // Draw eyebrow
     final eyebrowPaint = getPaint(withGradient: false);
     eyebrowPaint.strokeWidth = size.width / (strokeScalingFactor * 0.7);
     final eyebrowPath = Path();
@@ -41,26 +46,27 @@ class EyePainter extends CustomPainter {
 
     canvas.drawPath(eyebrowPath, eyebrowPaint);
 
-    // Define the paint
+    // Define the paint for the eyelid
     var eyelidpaint = getPaint(withGradient: true);
 
-    // Define the path
+    // Define the path for the eyelid
     var eyelidPath = Path();
 
     // Starting point for the eyelid path
     eyelidPath.moveTo(0, size.height / 2);
 
-    // Control point and end point
-    var controlPoint = Offset(size.width / 2, 0);
+    // Control point and end point for the eyelid animation
+    var controlPoint = Offset(size.width / 2, size.height * eyelidPosition);
     var endPoint = Offset(size.width, size.height / 2);
 
-    // Add the quadratic Bézier curve
+    // Add the quadratic Bézier curve to create the blinking effect
     eyelidPath.quadraticBezierTo(
       controlPoint.dx,
       controlPoint.dy,
       endPoint.dx,
       endPoint.dy,
     );
+
     eyelidPath.quadraticBezierTo(
       controlPoint.dx,
       size.height,
@@ -72,10 +78,9 @@ class EyePainter extends CustomPainter {
     canvas.drawPath(eyelidPath, eyelidpaint);
 
     canvas.save();
-
     canvas.clipPath(eyelidPath);
 
-    // the eyes ball should not leave the lid area
+    // The eyeball should not leave the lid area
     final eyeballRadius = size.width / 6;
     final eyeBallLimit = eyeballRadius;
 
@@ -91,9 +96,8 @@ class EyePainter extends CustomPainter {
       irisCenterOffsetY,
     );
 
-    // Define the paint for the Iris
+    // Define the paint for the iris
     var irisPaint = getPaint(withGradient: false);
-
     irisPaint.strokeWidth = size.width / (strokeScalingFactor * 0.75);
 
     canvas.drawCircle(
@@ -104,6 +108,7 @@ class EyePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant EyePainter oldDelegate) {
-    return oldDelegate.mousePositionPercentage != mousePositionPercentage;
+    return oldDelegate.mousePositionPercentage != mousePositionPercentage ||
+        oldDelegate.eyelidPosition != eyelidPosition;
   }
 }
