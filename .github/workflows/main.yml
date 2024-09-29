@@ -36,8 +36,7 @@ jobs:
 
       # Step 5: Modify index.html to remove <base href="/">
       - name: Remove <base href="/"> from index.html
-        run: |
-          sed -i '/<base href=\/>/d' build/web/index.html
+        run: grep -v '<base href="/">' build/web/index.html > build/web/index_temp.html mv build/web/index_temp.html build/web/index.html
 
       # Step 6: Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
