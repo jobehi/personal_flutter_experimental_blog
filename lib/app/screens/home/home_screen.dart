@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:youssef_el_behi/app/screens/home/painter/eye_painter.dart';
 
+import 'widgets/blinking_eye_widget.dart';
 import 'widgets/leaving_text.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -119,9 +119,8 @@ class _HomeScreenState extends State<HomeScreen>
                       width: eyeSize,
                       child: AspectRatio(
                         aspectRatio: 1,
-                        child: CustomPaint(
-                          painter: EyePainter(
-                              mousePositionPercentage: _currentEyePosition),
+                        child: BlinkingEyeAnimation(
+                          mousePositionPercentage: _currentEyePosition,
                         ),
                       ),
                     ),
