@@ -1,5 +1,10 @@
 name: Build and Deploy Flutter Web to GitHub Pages
 
+# Define permissions
+permissions:
+    contents: write   # Grants write access to the contents (required for pushing)
+  
+
 # Trigger the workflow on push to the release/web branch
 on:
   push:
