@@ -12,7 +12,6 @@ class AppTheme {
           textStyle: const TextStyle(
             fontSize: 16,
           ),
-          elevation: 8,
           shadowColor: Colors.blue.shade50,
           enableFeedback: true,
           shape: RoundedRectangleBorder(
