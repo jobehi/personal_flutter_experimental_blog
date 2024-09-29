@@ -31,7 +31,7 @@ jobs:
 
       # Step 4: Build the Flutter web app
       - name: Build Flutter Web
-        run: flutter build web --release --base-href /repo/
+        run: flutter build web --release --base-href /personal_flutter_experimental_blog/
 
       # Step 5: Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
