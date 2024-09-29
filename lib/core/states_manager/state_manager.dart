@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 
 abstract class ScreenState<T> {
   const ScreenState();
@@ -49,47 +50,58 @@ abstract class StateManager<T extends ScreenState, E extends ScreenEvent> {
   /// Controller to manage and broadcast state changes.
   final StreamController<T> _stateController = StreamController<T>.broadcast();
 
-  /// Getter for the state stream.
-  Stream<T> get stateStream => _stateController.stream;
+  /// Controller to manage incoming events.
+  final StreamController<E> _eventController = StreamController<E>();
 
-  E? _previousEvent;
+  /// Queue to hold incoming events.
+  final Queue<E> _eventQueue = Queue<E>();
 
-  /// Adds an event to be processed.
-  ///
-  /// If the event is the same as the previous one, it will be ignored
-  /// to prevent redundant state emissions.
-  void addEvent(E event) {
-    if (_previousEvent == event) {
-      return;
-    }
-    _previousEvent = event;
-    _processEvent(event);
+  /// Flag to indicate if an event is currently being processed.
+  bool _isProcessing = false;
+
+  /// Subscription to the event stream.
+  late final StreamSubscription<E> _eventSubscription;
+
+  StateManager() {
+    // Listen to incoming events and add them to the queue.
+    _eventSubscription = _eventController.stream.listen((event) {
+      _enqueueEvent(event);
+    });
   }
 
-  /// Processes the given event and updates the state accordingly.
-  ///
-  /// Listens to the stream returned by [mapEventToState] and adds
-  /// each new state to the [_stateController].
-  void _processEvent(E event) {
+  /// Adds an event to the event stream.
+  void addEvent(E event) {
+    _eventController.add(event);
+  }
+
+  /// Enqueues an event and starts processing if not already doing so.
+  void _enqueueEvent(E event) {
+    _eventQueue.add(event);
+    if (!_isProcessing) {
+      _processNextEvent();
+    }
+  }
+
+  /// Processes the next event in the queue.
+  void _processNextEvent() async {
+    if (_eventQueue.isEmpty) {
+      _isProcessing = false;
+      return;
+    }
+
+    _isProcessing = true;
+    final E event = _eventQueue.removeFirst();
+
     try {
       final Stream<T> stateStream = mapEventToState(event);
-      // Listen to the state stream and add each state to the controller.
-      stateStream.listen(
-        (state) {
-          _stateController.add(state);
-        },
-        onError: (error, stackTrace) {
-          // Handle errors from the state stream.
-          _stateController.addError(error, stackTrace);
-        },
-        onDone: () {
-          // Optionally handle stream completion.
-        },
-        cancelOnError: false,
-      );
+      await for (var state in stateStream) {
+        _stateController.add(state);
+      }
     } catch (e, stackTrace) {
-      // Handle synchronous errors.
       _stateController.addError(e, stackTrace);
+    } finally {
+      // After processing the current event, process the next one.
+      _processNextEvent();
     }
   }
 
@@ -106,11 +118,13 @@ abstract class StateManager<T extends ScreenState, E extends ScreenEvent> {
   /// are transformed into states.
   Stream<T> mapEventToState(E event);
 
-  /// Disposes resources by closing the state controller.
+  /// Disposes resources by closing controllers and subscriptions.
   ///
   /// It's crucial to call this method when the [StateManager] is no longer needed
   /// to free up resources and prevent memory leaks.
   void dispose() {
+    _eventSubscription.cancel();
+    _eventController.close();
     _stateController.close();
   }
 }
